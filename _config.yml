@@ -1,0 +1,29 @@
+title: Shady
+description: >-
+  关于电商、营销自动化、开源基础设施与工程实践的写作。
+author: Shady
+email: ""
+lang: zh-CN
+timezone: Asia/Shanghai
+
+theme: minima
+
+permalink: /blog/:title/
+
+show_excerpts: true
+
+header_pages:
+  - about.md
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+minima:
+  skin: auto
+  date_format: "%Y-%m-%d"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
