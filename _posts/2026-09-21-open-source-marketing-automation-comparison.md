@@ -50,7 +50,7 @@ tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeak
 | 项目 | 语言 / 许可 | 定位 | 旅程编排 | 事件分群 | 渠道 | 自部署 |
 | --- | --- | --- | --- | --- | --- | --- |
 | Mautic | PHP / GPL-3.0 | 经典营销自动化(邮件 + 线索培育) | 有(Campaign Builder) | 有(基于联系人字段) | 邮件/SMS(插件)/Webhook | 免费自部署 |
-| Laudspeaker | TypeScript / AGPL-3.0 | 客户互动与产品引导 | 有(可视化) | 有 | 邮件/SMS/Slack | 云版 + 付费自部署,官方仍标注 Public Alpha |
+| Laudspeaker | TypeScript / AGPL-3.0 | 客户互动与产品引导 | 有(可视化) | 有 | 邮件/SMS/Push/Webhook | **已于 2026 年停止开发与支持** |
 | Novu | TypeScript / MIT(Open Core) | 通知与沟通基础设施 | 工作流(非营销旅程) | 无(非营销分群) | 站内信/邮件/SMS/Push/Chat | 免费自部署 + 云 |
 | Listmonk | Go / AGPL-3.0 | 邮件列表 / Newsletter | 无 | 基础列表 | 邮件 | 免费自部署 |
 | PostHog | 多语言 / MIT(Open Core) | 产品分析 / 实验 / 轻量 CDP | 无(仅轻量工作流) | 分析维度 | 部分 | 免费自部署 + 云 |
@@ -59,12 +59,14 @@ tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeak
 一句话概括各自的缺口:
 
 - **Mautic** 是这个阵营里体量最大的通用方案(官方称"全球最大的开源营销自动化项目",号称 20 万+ 组织在用)。它把邮件营销和 B2B 线索培育做得很成熟,但架构是 PHP 单体,分群是围绕联系人字段而非"事件流 + 列式存储",不解决高并发事件摄入与实时分群的问题。
-- **Laudspeaker** 的定位和 Dittofeed 最接近(可视化旅程、事件触发、多渠道),但它自己的 README 仍写着 "Public Alpha",许可是 AGPL-3.0,且自部署走的是付费的商业/企业版路线(免费的是它的云版)。对"想免费自托管"的人,Dittofeed 的门槛低得多。
+- **Laudspeaker** 曾经是和 Dittofeed 最接近的对手:同样 TypeScript,同样是"事件触发 + 可视化旅程 + 多渠道"(邮件/SMS/Push/Webhook),还原生带 **A/B 测试**,技术栈上是 NestJS + PostgreSQL + ClickHouse + RabbitMQ/Redis,画布用 React Flow、邮件编辑器用 GrapesJS,功能广度一度不输甚至更"顺手"(内置 Slack 渠道、通知偏好、频控、Stripe 计费)。但它的 2026-07-10 提交直接把 README 首行改成了 **"no longer under active development or being supported"**,官网与云版同时下线,最后一个 release 停在 2024 年 6 月的 v1.7.0。这是一个很典型的结局:**开源项目把重心押在自建 SaaS 云上,云没跑出来,项目也就停了。**
 - **Novu** 常被拿来和 Dittofeed 比,其实是错位竞争。它是通知基础设施(一个 API 打通 In-App/邮件/SMS/Push/Chat,外加可嵌入的 `<Inbox/>` 组件),服务对象是"应用要把消息发给用户",不是"市场团队要做分群、旅程和活动"。它没有营销意义上的分群和旅程,更多是 Dittofeed 触达层的同类,而非替代品。
 - **Listmonk** 是极优秀的邮件列表工具,但只有列表和发送,没有决策层。
 - **PostHog** 是分析优先,能算事件、能实验,但不是一个营销旅程引擎。
 
-**结论很直接:在"事件流 + 可视化旅程 + 多渠道 + 免费自托管"这四项同时成立的开源项目里,真正能打的目前基本只有 Dittofeed 和 Laudspeaker 两家,而后者还未进入稳定阶段。** 这不是说 Dittofeed 世界第一,而是说这个交集本身很窄。
+**结论很直接:在"事件流 + 可视化旅程 + 多渠道 + 免费自托管"这四项同时成立的开源项目里,曾经的另一个候选 Laudspeaker 已经停更,真正还在持续迭代的目前基本只剩 Dittofeed。** 这不是说 Dittofeed 世界第一,而是说这个交集本身极窄,而且已经有人用"退出"证明了它有多难。
+
+值得一提的是,Laudspeaker 的沉没本身给出了一个教训:**这类项目一旦把商业模式押在"自建 SaaS 云"上,就会同时面对双重竞争——往下要自证开源比不过 Dittofeed 的开发者体验,往上要正面硬刚 Braze、Iterable 这些成熟 SaaS。** 反观 Dittofeed,选择 MIT、专注自部署与可嵌入底座,把"数据主权 + 单元成本"这两件事交给用户自己权衡,反而是在这个窄赛道里活下来的那条路。
 
 ## 四、Dittofeed 到底补了哪一块
 
@@ -136,7 +138,7 @@ Dittofeed 的技术选型,恰好对着上面每一层的缺口来的:
 
 ## 八、结论
 
-如果把问题限定为"企业要自部署一套完整的营销自动化,并且要求数据不出域、不按人头付费、最好还能嵌进自己的产品",那么在今天的开源版图里,能同时满足这几条的候选非常少。Mautic 成熟但架构和分群模型偏旧,Laudspeaker 方向相同却仍在 Alpha,Novu 解决的是另一层问题,Listmonk 和 PostHog 各管一段。
+如果把问题限定为"企业要自部署一套完整的营销自动化,并且要求数据不出域、不按人头付费、最好还能嵌进自己的产品",那么在今天的开源版图里,能同时满足这几条的候选非常少。Mautic 成熟但架构和分群模型偏旧,Laudspeaker 方向相同却已在 2026 年停更,Novu 解决的是另一层问题,Listmonk 和 PostHog 各管一段。
 
 Dittofeed 不是"世界第一",它的功能也远不及 Braze、Iterable 这些头部 SaaS。但它补上的是一块特定而稀缺的拼图:**一个事件驱动、可自托管、可白标嵌入、用 MIT 许可发布的完整营销自动化底座**。在"企业自部署"这个约束下,它确实是最接近"完整选项"的那一个。
 
