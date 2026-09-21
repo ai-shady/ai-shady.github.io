@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "从营销自动化说到 Dittofeed:或许是企业自部署该领域的王者"
+title: "从营销自动化到 Dittofeed:企业自部署该领域的一个完整选项"
 date: 2026-09-21 10:00:00 +0800
 categories: [营销自动化, 开源]
 tags: [Dittofeed, Iterable, CDP, 自部署, ClickHouse, Kafka]
