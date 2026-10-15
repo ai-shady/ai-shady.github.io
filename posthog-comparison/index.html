@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PostHog Cloud vs Amplitude vs Iterable — 能力对比</title>
+<style>
+  :root {
+    --bg: #141414;
+    --surface: #181818;
+    --surface-2: #1e1e1e;
+    --text: #e4e4e4;
+    --text-2: #a8a8a8;
+    --text-3: #6e6e6e;
+    --stroke: #2a2a2a;
+    --stroke-2: #333;
+    --accent: #599ce7;
+    --green: #3fa266;
+    --yellow: #f1b467;
+    --gray: #6e6e6e;
+    --purple: #9386f2;
+    --orange: #dd7f76;
+    --blue: #7bafe9;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #fcfcfc;
+      --surface: #ffffff;
+      --surface-2: #f6f6f6;
+      --text: #141414;
+      --text-2: #555;
+      --text-3: #8a8a8a;
+      --stroke: #e6e6e6;
+      --stroke-2: #d8d8d8;
+      --accent: #3685bf;
+      --green: #1f8a65;
+      --yellow: #c08532;
+      --gray: #8a8a8a;
+      --purple: #7754d9;
+      --orange: #d75c4e;
+      --blue: #3685bf;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 30px; font-weight: 650; letter-spacing: -0.01em; margin: 0 0 8px; }
+  h2 {
+    font-size: 19px; font-weight: 600; margin: 44px 0 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--stroke);
+  }
+  h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  p { margin: 0 0 10px; }
+  a { color: var(--accent); }
+  .lede { color: var(--text-2); font-size: 15px; max-width: 780px; }
+  .muted { color: var(--text-3); font-size: 13px; }
+
+  /* positioning cards */
+  .positions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  @media (max-width: 760px) { .positions { grid-template-columns: 1fr; } }
+  .pos {
+    background: var(--surface); border: 1px solid var(--stroke);
+    border-radius: 8px; padding: 16px;
+  }
+  .pos .dot {
+    width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+    margin-right: 8px; vertical-align: middle;
+  }
+  .pos .role { color: var(--text-2); font-size: 13px; margin-top: 6px; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; margin: 26px 0 0; }
+  .legend .item { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-2); }
+  .mark { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; white-space: nowrap; }
+  .mark .m-dot { width: 8px; height: 8px; border-radius: 9999px; flex: 0 0 auto; }
+  .mark.full .m-dot { background: var(--green); }
+  .mark.partial .m-dot { background: var(--yellow); }
+  .mark.none .m-dot { background: var(--gray); }
+  .mark.full { color: var(--text); }
+  .mark.partial { color: var(--text-2); }
+  .mark.none { color: var(--text-3); }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table-shell {
+    background: var(--surface); border: 1px solid var(--stroke);
+    border-radius: 8px; overflow-x: auto;
+  }
+  th, td { padding: 11px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--stroke); }
+  thead th {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase;
+    color: var(--text-3); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+  td.cap { width: 42%; }
+  td.cap .name { font-weight: 500; }
+  td.cap .note { display: block; font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+  .col-ph, .col-amp, .col-it { width: 19.3%; }
+
+  /* verdict callouts */
+  .verdicts { display: grid; gap: 12px; margin-top: 16px; }
+  .verdict {
+    border: 1px solid var(--stroke); border-left-width: 3px;
+    background: var(--surface); border-radius: 6px; padding: 14px 16px;
+  }
+  .verdict.info { border-left-color: var(--accent); }
+  .verdict.neutral { border-left-color: var(--text-3); }
+  .verdict.warn { border-left-color: var(--yellow); }
+  .verdict h3 { margin-bottom: 4px; }
+  .verdict p { color: var(--text-2); font-size: 13.5px; margin: 0; }
+
+  /* cloud banner */
+  .cloud-note {
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-top: 20px; padding: 12px 16px;
+    background: var(--surface); border: 1px solid var(--stroke);
+    border-left: 3px solid var(--blue); border-radius: 6px;
+    font-size: 13.5px; color: var(--text-2);
+  }
+  .cloud-note strong { color: var(--text); }
+
+  footer { margin-top: 52px; padding-top: 18px; border-top: 1px solid var(--stroke); color: var(--text-3); font-size: 12.5px; }
+  footer code { color: var(--text-2); }
+  footer strong { color: var(--text-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>PostHog Cloud vs Amplitude vs Iterable</h1>
+  <p class="lede">
+    跨「度量 · 实验 · 客户数据 · 跨渠道触达」的能力对照表。PostHog 侧统一按 <strong>PostHog Cloud</strong>
+    （官方全托管云版本）口径：横跨分析与消息的一体化平台；Amplitude 是分析侧冠军；Iterable 是消息触达侧冠军。
+    评分口径：<strong>Full</strong> 一等公民 / <strong>Partial</strong> 早期·受限·经合作方 / <strong>None</strong> 不提供。
+  </p>
+
+  <div class="cloud-note">
+    <span style="flex:0 0 auto;color:var(--blue);font-weight:600">Cloud</span>
+    <span>
+      本文 PostHog 列全部以 <strong>PostHog Cloud</strong> 为准：官方托管、免运维、自动升级到最新版本，
+      所有产品（分析、回放、Flags、实验、错误追踪、日志、LLM 观测、数仓、CDP、Workflows 触达）
+      在云上开箱即用。（PostHog 核心同时开源可自托管，但自托管版本的功能与运维状态不在本文口径内。）
+    </span>
+  </div>
+
+  <div class="positions">
+    <div class="pos">
+      <h3><span class="dot" style="background:var(--blue)"></span>PostHog Cloud</h3>
+      <div class="role">官方全托管云版本，免运维、自动升级。分析、回放、Feature flags、实验、错误追踪、LLM 观测、数仓、CDP，并通过 Workflows 提供原生跨渠道触达。</div>
+    </div>
+    <div class="pos">
+      <h3><span class="dot" style="background:var(--purple)"></span>Amplitude</h3>
+      <div class="role">产品分析领导者，整合会话回放、功能实验、CDP/激活、Guides &amp; Surveys。<strong>不做消息投递。</strong></div>
+    </div>
+    <div class="pos">
+      <h3><span class="dot" style="background:var(--orange)"></span>Iterable</h3>
+      <div class="role">跨渠道互动平台。邮件、SMS、Push、In-app、WhatsApp、旅程编排、AI 发送决策。<strong>不做产品分析。</strong></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="item"><span class="mark full"><span class="m-dot"></span>一等公民</span></span>
+    <span class="item"><span class="mark partial"><span class="m-dot"></span>部分 / 早期 / 经合作方</span></span>
+    <span class="item"><span class="mark none"><span class="m-dot"></span>不提供</span></span>
+  </div>
+
+  <h2>1 · 度量与分析</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">产品分析</span><span class="note">漏斗、留存、同期群、路径</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">Web / 流量分析</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">会话回放</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">自动埋点与热图</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">SQL / 数仓查询</span><span class="note">事件与外部数据同查</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">错误追踪</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">日志</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>2 · 实验与发布</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">Feature flags</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">A/B 测试 / 产品实验</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">高级统计</span><span class="note">CUPED、sequential testing、bandit</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">服务端本地求值</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">Holdout 与互斥组</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>3 · 可观测性与 AI</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">AI 产品助手</span><span class="note">自然语言分析</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">LLM / AI 观测</span><span class="note">trace、token 成本、评测</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">SDK 异常捕获</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+      <tr><td class="cap"><span class="name">预测式 ML</span><span class="note">流失、LTV、品牌倾向</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">AI Agent / MCP 接入</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>4 · 客户数据与画像</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">用户 / 人群画像</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">分群</span><span class="note">同期群 vs 动态列表</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">身份解析 / 合并</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">CDP</span><span class="note">数据源入、目标出</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">Reverse ETL / 数仓同步</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">B2B 群组 / 账号分析</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">画像级订阅偏好</span><span class="note">渠道与类目 opt-in 状态</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">画像级发送/打开/点击历史</span><span class="note">PostHog Cloud：以事件而非画像字段呈现</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>5 · 触达渠道</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">邮件 (EDM)</span><span class="note">PostHog Cloud：原生、需域名验证</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">SMS</span><span class="note">PostHog Cloud：需自备 Twilio 凭证</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">MMS</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">移动推送</span><span class="note">PostHog Cloud：开放 beta，需 FCM / APNs</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">Web 推送</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">In-app 消息</span><span class="note">PostHog Cloud：仅问卷形式</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">WhatsApp</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">Slack / Webhook / 自定义</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">嵌入 / 卡片消息</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>6 · 编排与内容</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">旅程 / 工作流自动化</span><span class="note">触发、延时、分流、发送</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">消息模板 / 内容库</span><span class="note">PostHog Cloud：目前仅邮件</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">个性化 / 合并标签</span><span class="note">Liquid (PostHog Cloud) vs Handlebars</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">目录 / 推荐</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">事务 / 触发式发送</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">消息级 A/B 测试</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">发送时机优化</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">频次控制 / 免打扰时段</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">跨渠道去重与优先级</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>7 · 送达能力与合规</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>能力</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">域名认证 (SPF / DKIM)</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">独立 IP 与预热</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">退信 / 抑制名单</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">退订 / 偏好中心</span><span class="note">PostHog Cloud：类目化 + RFC 8058 一键退订</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+      <tr><td class="cap"><span class="name">同意与治理工具</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>8 · 平台与部署</h2>
+  <div class="table-shell"><table>
+    <thead><tr><th>维度</th><th class="col-ph">PostHog Cloud</th><th class="col-amp">Amplitude</th><th class="col-it">Iterable</th></tr></thead>
+    <tbody>
+      <tr><td class="cap"><span class="name">交付形态</span></td><td>官方全托管云（Cloud）；核心同时开源可自托管</td><td>闭源 SaaS</td><td>闭源 SaaS</td></tr>
+      <tr><td class="cap"><span class="name">运维负担</span></td><td>零运维，官方自动升级至最新版本</td><td>零运维</td><td>零运维</td></tr>
+      <tr><td class="cap"><span class="name">定价方式</span></td><td>按用量（事件）</td><td>按用量（事件）+ 席位</td><td>按联系人分层报价</td></tr>
+      <tr><td class="cap"><span class="name">免费额度</span></td><td>有（较慷慨）</td><td>有（有限）</td><td>无</td></tr>
+      <tr><td class="cap"><span class="name">SDK 覆盖</span></td><td>Web、移动、服务端、AI（15+）</td><td>Web、移动、服务端（10+）</td><td>REST API + SDK</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>选型建议</h2>
+  <div class="verdicts">
+    <div class="verdict info">
+      <h3>选 PostHog Cloud 当…</h3>
+      <p>你想用一套官方全托管平台覆盖分析、回放、flags、实验、错误追踪、日志、LLM 观测与数仓，并希望直接基于真实产品事件触发邮件 / SMS / Push，而不想再接一个独立 ESP。免运维、自动升级，最适合工程团队主导的技术栈。</p>
+    </div>
+    <div class="verdict neutral">
+      <h3>选 Amplitude 当…</h3>
+      <p>严谨的产品分析与高级实验（CUPED、sequential、bandit、holdout）是核心诉求，消息交给专用工具。可与 Iterable 搭配补足发送侧。</p>
+    </div>
+    <div class="verdict warn">
+      <h3>选 Iterable 当…</h3>
+      <p>跨渠道生命周期营销、送达率工程与发送时机 AI 是主业。上游可搭配 PostHog Cloud / Amplitude 补足产品分析侧。</p>
+    </div>
+  </div>
+
+  <footer>
+    PostHog 侧内容依据 <strong>PostHog Cloud</strong>（官方全托管云版本）口径。数据来源：posthog.com 官方文档（llms.txt、Workflows、
+    渠道配置、CDP、person properties、opt-outs）· amplitude.com 产品与实验页 · iterable.com 及 Iterable 支持中心。整理时间 2026-10-15。
+    “Partial” = 已发布但偏早期 / 能力受限 / 经合作方而非原生实现。标注 Partial 的判读（如 PostHog Cloud 的独立 IP、
+    MMS / Web push 支持度、Iterable 的 MMS）官方表述不完全明确，按保守口径处理。
+  </footer>
+</div>
+</body>
+</html>
