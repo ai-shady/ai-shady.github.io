@@ -1,0 +1,57 @@
+---
+---
+
+/*
+ * Site-local styles.
+ * Additive only: these class names do not exist in minima, so nothing here
+ * overrides or conflicts with the theme. Removing this file and the single
+ * <link> in _includes/head.html fully reverts the site to stock minima.
+ */
+
+.entry-card {
+  display: block;
+  margin: 0 0 34px;
+  padding: 18px 20px;
+  border: 1px solid #e8e8e8;
+  border-left: 4px solid #2a7ae2;
+  background: #f6f8fb;
+  text-decoration: none;
+}
+
+.entry-card:hover {
+  text-decoration: none;
+  background: #eef3fa;
+}
+
+.entry-card .entry-kicker,
+.entry-card .entry-title,
+.entry-card .entry-desc {
+  display: block;
+}
+
+.entry-card .entry-kicker {
+  margin-bottom: 6px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #828282;
+}
+
+.entry-card .entry-title {
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #2a7ae2;
+}
+
+.entry-card:hover .entry-title {
+  text-decoration: underline;
+}
+
+.entry-card .entry-desc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #515151;
+}

@@ -6,6 +6,9 @@ email: ""
 lang: zh-CN
 timezone: Asia/Shanghai
 
+url: https://ai-shady.github.io
+baseurl: ""
+
 theme: minima
 
 permalink: /blog/:title/
@@ -13,11 +16,13 @@ permalink: /blog/:title/
 show_excerpts: true
 
 header_pages:
+  - blog/index.md
   - about.md
 
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 minima:
   skin: auto
