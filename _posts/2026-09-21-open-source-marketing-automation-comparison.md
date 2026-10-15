@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "从营销自动化到 Dittofeed:开源自部署方案的横向评测"
+title: "从营销自动化到 Dittofeed:可自部署也可上云的开源方案横向评测"
 date: 2026-09-21 10:00:00 +0800
 categories: [营销自动化, 开源]
 tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeaker, CDP, 自部署, ClickHouse, Kafka]
