@@ -10,7 +10,7 @@ tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeak
 
 营销自动化这个赛道,过去十年基本被 SaaS 厂商按"每用户每月"或"每千封邮件"的方式收税。Dittofeed 试图把整条链路装进一个可以自己部署、也可以上官方云的系统里。本文就以"替换 Iterable"为标尺,评估它到底成不成立。
 
-> **2026 年 10 月更新**:本文最初写于 2026 年 9 月。之后我在本地用 Docker Compose 完整部署了一套 Dittofeed,并对照它的 API 与数据模型逐模块实测。因此本次更新新增了第八节(自部署实测),并根据实测结果修正了原文对项目活跃度的判断(见第九节)。
+> **2026 年 10 月更新**:本文最初写于 2026 年 9 月。之后我在本地用 Docker Compose 完整部署了一套 Dittofeed,并对照它的 API 与数据模型逐模块实测。因此本次更新新增了第八节(自部署实测),并根据实测结果修正了原文对项目活跃度的判断(见第九节);同时,第二、三、五节中各厂商的渠道清单与 AI 能力名称已按各家官方文档逐一重新核对并修正。
 
 ## 一、先把地图画出来:营销自动化的三层结构
 
@@ -28,9 +28,9 @@ tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeak
 
 | 平台 | 主战场 | 渠道广度 | 旅程编排 | AI/预测 | 自部署 | 典型计费 |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Iterable(本文基准)** | 跨渠道生命周期营销 | 邮件/SMS/Push/站内信/Web Push/直邮 | 强 | Brand Affinity、发送时机优化 | 否 | 按发送量 |
-| Braze | 移动优先的跨渠道互动 | 邮件/SMS/Push/站内信/Content Card | 强 | BrazeAI、预测 | 否 | 按 MAU |
-| Klaviyo | 电商/DTC | 邮件/SMS/Push | 强 | 预测 CLV、流失 | 否 | 按联系人 |
+| **Iterable(本文基准)** | 跨渠道生命周期营销 | 邮件/SMS/MMS/Push/站内信/Web Push/Webhook | 强 | Nova Intelligence、发送时机优化 | 否 | 按发送量 |
+| Braze | 移动优先的跨渠道互动 | 邮件/SMS/MMS/RCS/Push/站内信/Content Card/Banner/WhatsApp/LINE/Webhook | 强 | BrazeAI、预测 | 否 | 按 MAU |
+| Klaviyo | 电商/DTC | 邮件/SMS/RCS/WhatsApp/Push/Web/社交 | 强 | 预测 CLV、流失 | 否 | 按联系人 |
 | Customer.io | 行为触发的产品消息 | 邮件/SMS/Push/站内信/Webhook | 强 | 有限 | 否 | 按用户 |
 | Salesforce MC / Marketo / HubSpot / ActiveCampaign / Mailchimp / OneSignal / Segment Engage / MoEngage 等 | 企业、CRM、中小企业邮件、推送基础设施、受众激活 | 从邮件到广告、WhatsApp | 中-强 | 多为有限 | 否(个别支持私有化) | 席位/联系人/事件量 |
 
@@ -42,16 +42,16 @@ tags: [Dittofeed, Braze, Iterable, Klaviyo, Customer.io, Mautic, Novu, Laudspeak
 
 | 项目 | 语言 / 许可 | 定位 | 旅程编排 | 事件分群 | 渠道 | 自部署 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Mautic | PHP / GPL-3.0 | 经典营销自动化(邮件 + 线索培育) | 有(Campaign Builder) | 有(基于联系人字段) | 邮件/SMS(插件)/Webhook | 免费自部署 |
+| Mautic | PHP / GPL-3.0 | 经典营销自动化(邮件 + 线索培育) | 有(Campaign Builder) | 有(基于联系人字段) | 邮件/SMS/Web 与移动推送(OneSignal)/Focus Items/社交/Webhook | 免费自部署 |
 | Laudspeaker | TypeScript / AGPL-3.0 | 客户互动与产品引导 | 有(可视化) | 有 | 邮件/SMS/Push/Webhook | **已于 2026 年停止开发与支持** |
 | Novu | TypeScript / MIT(Open Core) | 通知与沟通基础设施 | 工作流(非营销旅程) | 无(非营销分群) | 站内信/邮件/SMS/Push/Chat | 免费自部署 + 云 |
 | Listmonk | Go / AGPL-3.0 | 邮件列表 / Newsletter | 无 | 基础列表 | 邮件 | 免费自部署 |
 | PostHog | 多语言 / MIT(Open Core) | 产品分析 / 实验 / 轻量 CDP | 无(仅轻量工作流) | 分析维度 | 部分 | 免费自部署 + 云 |
-| **Dittofeed** | TypeScript / MIT(Open Core) | 全渠道营销自动化(自部署 + 官方云) | 有(可视化) | 有(ClickHouse 事件分群) | 邮件/SMS/Push/Webhook | 免费自部署 + 云 |
+| **Dittofeed** | TypeScript / MIT(Open Core) | 全渠道营销自动化(自部署 + 官方云) | 有(可视化) | 有(ClickHouse 事件分群) | 邮件/SMS/Webhook | 免费自部署 + 云 |
 
 一句话概括各自的缺口:
 
-- **Mautic** 是这个阵营里真正的重量级老将(官方称"全球最大的开源营销自动化项目",号称 20 万+ 组织在用),也是绕不过去的对手。**10,500+ stars、3,400+ forks、295 关注者**,2013 年至今十余年,**至今每周仍在合并 PR**(最近一次 2026-09),最新版本 7.2.0 发布于 2026-09,还被联合国认证为 **Digital Public Good**。它的技术选择是"老派"的 PHP 单体,分群围绕联系人字段而非"事件流 + 列式存储",不解决高并发事件摄入与实时分群,却依然扛住了这个领域第一的活跃度。
+- **Mautic** 是这个阵营里真正的重量级老将(官网自称"全球最大的开源营销自动化产品",并称 **40,000+ 家公司** 在用),也是绕不过去的对手。**10,700+ stars、3,400+ forks、约 290 关注者**,2013 年至今十余年,**至今仍在持续合并 PR**(最近一次 2026-10),最新版本 **7.2.1 发布于 2026-09**,并已由 Digital Public Goods Alliance 认定为 **Digital Public Good**。它的技术选择是"老派"的 PHP 单体,分群围绕联系人字段而非"事件流 + 列式存储",不解决高并发事件摄入与实时分群,却依然扛住了这个领域第一的活跃度。
 - **Laudspeaker** 曾经是和 Dittofeed 最接近的对手:同样 TypeScript、同样是"事件触发 + 可视化旅程 + 多渠道",还原生带 **A/B 测试**,技术栈是 NestJS + PostgreSQL + ClickHouse + RabbitMQ/Redis,功能广度一度不输甚至更"顺手"。但它在 2026-07-10 把 README 首行改成了 **"no longer under active development or being supported"**,官网与云版同时下线,最后一个 release 停在 2024 年 6 月的 v1.7.0。这是一个很典型的结局:**开源项目把重心押在自建 SaaS 云上,云没跑出来,项目也就停了。**
 - **Novu / Listmonk / PostHog** 各只覆盖一段:Novu 是通知基础设施(一个 API 打通 In-App/邮件/SMS/Push/Chat,外加可嵌入的 `<Inbox/>`),服务"应用给用户发消息",没有营销分群与旅程,只是 Dittofeed 触达层的同类;Listmonk 只有列表与发送,没有决策层;PostHog 分析优先,能算事件、能实验,但不是营销旅程引擎。
 
@@ -67,7 +67,7 @@ Dittofeed 的技术选型,恰好对着上面每一层的缺口来的:
 | --- | --- | --- |
 | 数据层 | 兼容 Segment 的 API(identify/track/page/screen/group/batch)、Segment.io Webhook、Polytomic 反向 ETL | 数据接入不用重写埋点,迁移成本低 |
 | 决策层 | 事件存入 ClickHouse,分群直接建在事件之上;旅程由 Temporal 驱动(Entry/Message/Wait For/Delay/Segment Split/Exit) | 分群能按"用户做过的行为"算,而不是只按字段 |
-| 触达层 | 邮件走 SendGrid/Postmark/Resend/SMTP/SES/Mailchimp(Mandrill),短信走 Twilio/SignalWire,另有 Push(移动端尚未完成)与 Webhook;模板用 MJML/HTML + Liquid | 不自己做 ESP,借用成熟投递管道 |
+| 触达层 | 官方文档列出的渠道为 **Email / SMS / Webhooks** 三条:邮件走 SendGrid/Amazon SES/Resend/Postmark/SMTP/Mailchimp,短信走 Twilio/SignalWire;模板用 MJML/HTML + Liquid | 不自己做 ESP,借用成熟投递管道 |
 | 存储 | PostgreSQL + ClickHouse + Kafka + Temporal | 事件量大的时候不至于拖垮生产库 |
 
 两个真正建立差异化的点:
@@ -89,9 +89,9 @@ Dittofeed 的技术选型,恰好对着上面每一层的缺口来的:
 | 埋点接入 | 自有 API/SDK,按 Iterable 数据模型上报 | 兼容 Segment 的 API,埋点基本可平移 |
 | 分群语义 | 事件与画像分群 | ClickHouse 事件分群(节点含属性/行为/与或/订阅组) |
 | 旅程编排 | 强,久经打磨,模板生态丰富 | 有且完整(Entry/Message/Wait/Delay/Split/Exit),生态与模板少于 Iterable |
-| 订阅/偏好中心 | 内置偏好与退订管理 | 订阅组 + HMAC 自助页,支持整渠道退订 |
-| 渠道覆盖 | 邮件/SMS/Push/站内信/Web Push/直邮 | 邮件/SMS/Webhook 可用;Push 未完成 |
-| AI / 预测 | Brand Affinity、发送时机优化 | 无原生 AI/预测 |
+| 订阅/偏好中心 | 内置偏好与退订管理 | 订阅组 + 加密哈希签名的自助页,支持整渠道退订 |
+| 渠道覆盖 | 邮件/SMS/MMS/Push/站内信/Web Push/Webhook | 邮件/SMS/Webhook 可用;Push 未完成 |
+| AI / 预测 | Nova Intelligence、发送时机优化 | 无原生 AI/预测 |
 | A/B 与实验 | 原生多变量与发送时机实验 | 无原生 A/B |
 | 商品目录/推荐 | 有 Catalogs、产品推荐 | 无 |
 | 分析归因 | 漏斗、留存、归因报表齐全 | 基础分析 API(chart-data/summary/journey-stats) |
@@ -128,9 +128,9 @@ Dittofeed 的技术选型,恰好对着上面每一层的缺口来的:
 
 前面的判断多来自文档。为不停留在纸面,我在本地用 Docker Compose 完整部署了一套 Dittofeed,逐模块实跑了一遍,下面只记实测确认、且对迁移决策有意义的部分。
 
-**部署与鉴权。** 完整的一套由 7 个容器组成:`api`/`worker`/`dashboard`/`admin-cli` 加上 PostgreSQL、ClickHouse、Temporal(消息队列用 Redpanda);`worker` 本质上是一个 Temporal worker,旅程、广播、分群计算都跑在它消费的工作流上——这也是"秒级实时触达"不是它强项的原因。鉴权分三套平面:`/api/*` 用写入密钥,覆盖用户、分群、模板、旅程、广播、投递、分析等主要操作;`/api/public/*` 无鉴权,面向埋点与终端用户,含与 **Segment 兼容的** `identify/track/page/screen/group/alias/batch`、订阅偏好自助页(带 HMAC 签名、支持整渠道退订)与入站 Webhook;`/api/admin/*` 用 dashboard 成员会话鉴权,少数管理能力(如组件配置)只在这里暴露。
+**部署与鉴权。** 完整的一套由 7 个容器组成:`api`/`worker`/`dashboard`/`admin-cli` 加上 PostgreSQL、ClickHouse、Temporal(消息队列用 Redpanda);`worker` 本质上是一个 Temporal worker,旅程、广播、分群计算都跑在它消费的工作流上——这也是"秒级实时触达"不是它强项的原因。鉴权分三套平面:`/api/*` 用写入密钥,覆盖用户、分群、模板、旅程、广播、投递、分析等主要操作;`/api/public/*` 无鉴权,面向埋点与终端用户,含与 **Segment 兼容的** `identify/track/page/screen/group/alias/batch`、订阅偏好自助页(带加密哈希签名、支持整渠道退订)与入站 Webhook;`/api/admin/*` 用 dashboard 成员会话鉴权,少数管理能力(如组件配置)只在这里暴露。
 
-**逐模块结论。** 三层能力都逐项验证过:用户与用户属性;建在 ClickHouse 事件之上的分群(节点含 Trait/Performed/And/Or 与订阅组,操作符为 Equals/NotEquals/Exists/NotExists/GreaterThanOrEqual/LessThan/HasBeen/Within 等);按渠道 OptIn/OptOut 的订阅组(自动生成两个内部 Segment);模板(邮件/SMS/Webhook/Push,Liquid + MJML);Segment/Event 两种入口的 Temporal 旅程;广播 V2 生命周期;投递日志、分析与事件导出。本地默认走邮件 Test provider,把发送记成内部事件 `DFInternalMessageSent` 而不真正外发,便于端到端验证。
+**逐模块结论。** 三层能力都逐项验证过:用户与用户属性;建在 ClickHouse 事件之上的分群(节点含 Trait/Performed/And/Or 与订阅组,操作符为 Equals/NotEquals/Exists/NotExists/GreaterThanOrEqual/LessThan/HasBeen/Within 等);按渠道 OptIn/OptOut 的订阅组(自动生成两个内部 Segment);模板(邮件/SMS/Webhook,Liquid + MJML);Segment/Event 两种入口的 Temporal 旅程;广播 V2 生命周期;投递日志、分析与事件导出。本地默认走邮件 Test provider,把发送记成内部事件 `DFInternalMessageSent` 而不真正外发,便于端到端验证。
 
 **几个只有亲手跑才会撞到、却直接影响迁移正确性的坑:**
 
@@ -155,7 +155,7 @@ Dittofeed 的技术选型,恰好对着上面每一层的缺口来的:
 
 ## 十、结论
 
-回到最初的问题——"能不能替换 Iterable?":在"事件流 + 可视化旅程 + 多渠道 + 可自部署/可上云"这个交集里,今天的候选非常少。**Mautic 是体量与社区的第一**(万余 stars、每周仍在迭代、联合国认证的公共数字产品),但走的是通用邮件营销与线索培育路线;Laudspeaker 方向相近却已在 2026 年停更;Novu / Listmonk / PostHog 各管一段。
+回到最初的问题——"能不能替换 Iterable?":在"事件流 + 可视化旅程 + 多渠道 + 可自部署/可上云"这个交集里,今天的候选非常少。**Mautic 是体量与社区的第一**(万余 stars、至今仍在迭代、Digital Public Goods Alliance 认定的公共数字产品),但走的是通用邮件营销与线索培育路线;Laudspeaker 方向相近却已在 2026 年停更;Novu / Listmonk / PostHog 各管一段。
 
 顺带一个容易被忽视的判断:**技术栈没有绝对的高与低。** Mautic 用最"不时髦"的 PHP 撑起这个领域最大的开源社区;Laudspeaker 用最"现代"的 TypeScript + ClickHouse 却没能活下来——决定生死的是定位与社区能否自我造血,而不是语言与潮流。
 
