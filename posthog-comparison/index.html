@@ -163,7 +163,7 @@
     </div>
     <div class="pos">
       <h3><span class="dot" style="background:var(--orange)"></span>Iterable</h3>
-      <div class="role">跨渠道互动平台。邮件、SMS、Push、In-app、WhatsApp、旅程编排、AI 发送决策。<strong>不做产品分析。</strong></div>
+      <div class="role">跨渠道互动平台。邮件、SMS/MMS、Push、In-app、Web Push、WhatsApp、旅程编排、AI 发送决策。<strong>不做产品分析。</strong></div>
     </div>
   </div>
 
@@ -232,7 +232,7 @@
     <tbody>
       <tr><td class="cap"><span class="name">邮件 (EDM)</span><span class="note">PostHog Cloud：原生、需域名验证</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
       <tr><td class="cap"><span class="name">SMS</span><span class="note">PostHog Cloud：需自备 Twilio 凭证</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
-      <tr><td class="cap"><span class="name">MMS</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td></tr>
+      <tr><td class="cap"><span class="name">MMS</span><span class="note">Iterable：官方 FAQ 明确支持 SMS/MMS</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
       <tr><td class="cap"><span class="name">移动推送</span><span class="note">PostHog Cloud：开放 beta，需 FCM / APNs</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
       <tr><td class="cap"><span class="name">Web 推送</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark none"><span class="m-dot"></span>None</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
       <tr><td class="cap"><span class="name">In-app 消息</span><span class="note">PostHog Cloud：仅问卷形式</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark partial"><span class="m-dot"></span>Partial</span></td><td><span class="mark full"><span class="m-dot"></span>Full</span></td></tr>
@@ -301,8 +301,8 @@
   <footer>
     PostHog 侧内容依据 <strong>PostHog Cloud</strong>（官方全托管云版本）口径。数据来源：posthog.com 官方文档（llms.txt、Workflows、
     渠道配置、CDP、person properties、opt-outs）· amplitude.com 产品与实验页 · iterable.com 及 Iterable 支持中心。整理时间 2026-10-15。
-    “Partial” = 已发布但偏早期 / 能力受限 / 经合作方而非原生实现。标注 Partial 的判读（如 PostHog Cloud 的独立 IP、
-    MMS / Web push 支持度、Iterable 的 MMS）官方表述不完全明确，按保守口径处理。
+    “Partial” = 已发布但偏早期 / 能力受限 / 经合作方而非原生实现。标注 Partial 的判读（如 PostHog Cloud 的独立 IP 预热、
+    移动推送的开放 beta 状态）官方表述不完全明确，按保守口径处理。
   </footer>
 </div>
 </body>
