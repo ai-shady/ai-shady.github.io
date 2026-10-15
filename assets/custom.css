@@ -3,24 +3,43 @@
 
 /*
  * Site-local styles.
- * Additive only: these class names do not exist in minima, so nothing here
- * overrides or conflicts with the theme. Removing this file and the single
- * <link> in _includes/head.html fully reverts the site to stock minima.
+ *
+ * minima 2.5.x ships light-only colours (no prefers-color-scheme at all), so
+ * dark mode has to be contributed here. Two kinds of rules live below:
+ *
+ *   1. new classes that do not exist in minima (.entry-card)
+ *   2. colour overrides scoped to prefers-color-scheme: dark
+ *
+ * The light theme is untouched. Deleting this file and the single <link> in
+ * _includes/head.html reverts the site to stock minima.
  */
+
+:root {
+  --c-bg: #fdfdfd;
+  --c-text: #111111;
+  --c-text-soft: #515151;
+  --c-text-muted: #828282;
+  --c-stroke: #e8e8e8;
+  --c-surface: #f6f8fb;
+  --c-surface-hover: #eef3fa;
+  --c-accent: #2a7ae2;
+}
+
+/* ---------- homepage entry card (new component) ---------- */
 
 .entry-card {
   display: block;
   margin: 0 0 34px;
   padding: 18px 20px;
-  border: 1px solid #e8e8e8;
-  border-left: 4px solid #2a7ae2;
-  background: #f6f8fb;
+  border: 1px solid var(--c-stroke);
+  border-left: 4px solid var(--c-accent);
+  background: var(--c-surface);
   text-decoration: none;
 }
 
 .entry-card:hover {
   text-decoration: none;
-  background: #eef3fa;
+  background: var(--c-surface-hover);
 }
 
 .entry-card .entry-kicker,
@@ -34,7 +53,7 @@
   font-size: 12px;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: #828282;
+  color: var(--c-text-muted);
 }
 
 .entry-card .entry-title {
@@ -42,7 +61,7 @@
   font-size: 20px;
   font-weight: 600;
   line-height: 1.35;
-  color: #2a7ae2;
+  color: var(--c-accent);
 }
 
 .entry-card:hover .entry-title {
@@ -53,5 +72,182 @@
   margin: 0;
   font-size: 15px;
   line-height: 1.6;
-  color: #515151;
+  color: var(--c-text-soft);
+}
+
+/* ---------- dark mode ----------
+ * Driven purely by the reader's OS / browser preference. No JS, no toggle,
+ * no stored state: whatever the browser reports is what gets rendered.
+ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --c-bg: #141414;
+    --c-text: #e4e4e4;
+    --c-text-soft: #a8a8a8;
+    --c-text-muted: #8a8a8a;
+    --c-stroke: #2a2a2a;
+    --c-surface: #1a1a1a;
+    --c-surface-hover: #202020;
+    --c-accent: #599ce7;
+  }
+
+  body {
+    color: var(--c-text);
+    background-color: var(--c-bg);
+  }
+
+  a {
+    color: var(--c-accent);
+  }
+
+  a:visited {
+    color: #9b8ef5;
+  }
+
+  a:hover {
+    color: var(--c-text);
+  }
+
+  .site-header {
+    border-top-color: #333333;
+    border-bottom-color: var(--c-stroke);
+  }
+
+  .site-title,
+  .site-title:visited {
+    color: var(--c-text);
+  }
+
+  .site-nav .page-link {
+    color: var(--c-text);
+  }
+
+  /* the hamburger glyph is an inline SVG with no fill of its own */
+  .site-nav .menu-icon svg {
+    fill: var(--c-text);
+  }
+
+  .site-footer {
+    border-top-color: var(--c-stroke);
+  }
+
+  .footer-col-wrapper,
+  .post-meta {
+    color: var(--c-text-muted);
+  }
+
+  .svg-icon {
+    color: var(--c-text-muted);
+    fill: var(--c-text-muted);
+  }
+
+  blockquote {
+    color: var(--c-text-soft);
+    border-left-color: var(--c-stroke);
+  }
+
+  pre,
+  code {
+    color: var(--c-text);
+    border-color: var(--c-stroke);
+    background-color: #1e1e1e;
+  }
+
+  .highlight,
+  .highlighter-rouge .highlight {
+    background: #1e1e1e;
+  }
+
+  table {
+    color: #dcdcdc;
+    border-color: var(--c-stroke);
+  }
+
+  table tr:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+
+  table th {
+    background-color: #222222;
+    border-color: var(--c-stroke);
+    border-bottom-color: #333333;
+  }
+
+  table td {
+    border-color: var(--c-stroke);
+  }
+
+  /* Rouge token colours are tuned for a white background */
+  .highlight .c,
+  .highlight .cm,
+  .highlight .c1,
+  .highlight .cp,
+  .highlight .cs {
+    color: #7f8c8d;
+  }
+
+  .highlight .kt,
+  .highlight .nc,
+  .highlight .nn {
+    color: #7bb0e8;
+  }
+
+  .highlight .m,
+  .highlight .mf,
+  .highlight .mh,
+  .highlight .mi,
+  .highlight .mo,
+  .highlight .na,
+  .highlight .no,
+  .highlight .nv,
+  .highlight .vc,
+  .highlight .vg,
+  .highlight .vi {
+    color: #7bd0c0;
+  }
+
+  .highlight .s,
+  .highlight .sb,
+  .highlight .sc,
+  .highlight .sd,
+  .highlight .s2,
+  .highlight .se,
+  .highlight .sh,
+  .highlight .si,
+  .highlight .sx,
+  .highlight .s1 {
+    color: #8fbf7f;
+  }
+
+  .highlight .gr,
+  .highlight .gt,
+  .highlight .ne,
+  .highlight .nf {
+    color: #dd7f76;
+  }
+
+  .highlight .gp,
+  .highlight .go,
+  .highlight .gu,
+  .highlight .w,
+  .highlight .bp,
+  .highlight .gh {
+    color: var(--c-text-muted);
+  }
+
+  .highlight .err {
+    color: #dd7f76;
+    background-color: #2a1a1a;
+  }
+}
+
+/* The collapsed mobile nav paints an opaque panel behind its links, and that
+ * panel is hard-coded to the light background in minima. */
+@media (prefers-color-scheme: dark) and (max-width: 600px) {
+  .site-nav {
+    background-color: #181818;
+    border-color: #2a2a2a;
+  }
 }
